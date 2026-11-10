@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="沪深 A 股神经网络模拟训练与历史回测监控">
+  <title>量化训练台 · Stock Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M4 16 9 9l4 4 7-8M4 20h16M16 5h4v4"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></symbol>
+    <symbol id="i-agents" viewBox="0 0 24 24"><path d="M8 5h8v14H8zM5 8H3m2 4H3m2 4H3m16-8h2m-2 4h2m-2 4h2M11 9h2m-2 6h2"/></symbol>
+    <symbol id="i-data" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 4 14 4 14 0V6M5 12c0 4 14 4 14 0"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19 11a7 7 0 1 0-2 6m2-11v5h-5"/></symbol>
+  </svg>
+  <header class="topbar"><div class="brand"><svg><use href="#i-logo"/></svg><span>Stock Lab</span><span class="brand-scope">/ 量化训练台</span></div><span class="mode">历史模拟</span></header>
+  <nav class="rail" aria-label="面板导航">
+    <a href="#overview" title="概览" aria-label="概览" class="selected"><svg><use href="#i-home"/></svg><span>概览</span></a>
+    <a href="#agents" title="账户" aria-label="账户"><svg><use href="#i-agents"/></svg><span>账户</span></a>
+    <a href="#coverage" title="数据" aria-label="数据"><svg><use href="#i-data"/></svg><span>数据</span></a>
+  </nav>
+  <main id="overview">
+    <div class="heading"><div><p class="eyeline">模拟研究 / 沪深 A 股</p><h1>量化训练台</h1><p id="finding" class="muted">正在读取最近一次训练。</p></div><button class="primary" id="refresh"><svg><use href="#i-refresh"/></svg>刷新状态</button></div>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <section class="panel run" aria-labelledby="run-title">
+      <div class="run-main"><div class="section-title"><h2 id="run-title">训练进度</h2><span id="status" class="status">读取中</span></div><p class="progress-figure"><strong id="completed">—</strong><span id="total">/ —</span><span class="unit">个 agent</span></p><progress id="progress" max="1" value="0" aria-label="训练完成进度"></progress></div>
+      <dl class="run-meta"><div><dt>当前阶段</dt><dd id="stage">—</dd></div><div><dt>每账户初始资金</dt><dd id="initial">—</dd></div><div><dt>状态最后更新</dt><dd id="updated">—</dd></div></dl>
+    </section>
+    <div class="overview-grid">
+      <section class="panel equity-panel" aria-labelledby="equity-title">
+        <div class="section-title spread"><div><h2 id="equity-title">历史回测资金</h2><p class="muted" id="test-window">最近一次完成的训练</p></div><div class="segments" aria-label="图表时间范围"><button data-range="all" aria-pressed="true">全部</button><button data-range="1y" aria-pressed="false">近一年</button></div></div>
+        <div class="kpis"><div><span>集成策略期末</span><strong id="ending">—</strong></div><div><span>最大回撤</span><strong id="drawdown">—</strong></div><div><span>方向排序 AUC</span><strong id="auc">—</strong></div></div>
+        <div class="legend" aria-label="曲线图例"><span><i class="swatch ensemble"></i>集成策略</span><span><i class="swatch momentum"></i>20 日动量</span><span><i class="swatch cash"></i>持有现金</span></div>
+        <div id="chart" class="chart" tabindex="0" aria-label="回测账户资金曲线，方向键查看每日数值"><svg id="plot" role="img" aria-label="集成策略、动量策略与现金基准的资金对比"></svg><div id="tooltip" class="tooltip" hidden></div><p id="chart-empty" class="empty">等待可用回测。</p></div>
+        <div id="comparison" class="comparison"></div>
+      </section>
+      <aside class="side">
+        <section class="panel compact" aria-labelledby="steps-title"><h2 id="steps-title">运行阶段</h2><ol class="stages" id="stages"></ol><p class="muted" id="connection">等待数据连接</p></section>
+        <section class="panel compact" aria-labelledby="checks-title"><h2 id="checks-title">结果核对</h2><dl class="rows" id="checks"></dl></section>
+      </aside>
+    </div>
+    <div class="detail-grid">
+      <section class="panel compact" id="agents" aria-labelledby="agents-title"><div class="section-title spread"><div><h2 id="agents-title">独立账户 · 验证期</h2><p class="muted" id="agent-summary">等待账户明细</p></div><select id="agent-sort" aria-label="账户排序"><option value="high">期末资金最高</option><option value="low">期末资金最低</option><option value="seed">按 seed 排列</option></select></div><div class="distribution" id="distribution" aria-label="独立账户的验证期资金分布"></div><div class="table-wrap"><table><thead><tr><th scope="col">Agent</th><th scope="col">期末资金</th><th scope="col">收益率</th><th scope="col">成交</th></tr></thead><tbody id="agent-table"></tbody></table></div><button class="secondary" id="more-agents">查看更多账户</button></section>
+      <section class="panel compact" aria-labelledby="trades-title"><div class="section-title spread"><div><h2 id="trades-title">最近模拟成交</h2><p class="muted">历史回测的成交记录</p></div><select id="trade-strategy" aria-label="成交策略"><option value="all">全部策略</option><option value="ensemble">集成策略</option><option value="momentum_20d">20 日动量</option></select></div><div class="table-wrap"><table><thead><tr><th scope="col">日期 / 标的</th><th scope="col">方向</th><th scope="col">股数</th><th scope="col">价格</th></tr></thead><tbody id="trade-table"></tbody></table></div></section>
+    </div>
+    <section class="panel compact coverage" id="coverage" aria-labelledby="coverage-title"><h2 id="coverage-title">历史数据覆盖</h2><div class="coverage-grid"><dl class="rows" id="data-meta"></dl><div><div id="coverage-chart" class="coverage-chart" aria-label="历年有行情记录的股票数量"></div></div></div><p class="muted">沪深主板样本。复权因子用于近似分红送转，退市回收按情景估计。</p></section>
+    <footer><span>Stock Lab / 历史模拟监控</span><a id="repo" hidden>GitHub 仓库 ↗</a></footer>
+    <noscript>请启用 JavaScript 查看训练状态和曲线。</noscript>
+  </main>
+</body>
+</html>
